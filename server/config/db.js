@@ -2,12 +2,15 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
+    const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+    if (!mongoUri) {
+      throw new Error("MONGO_URI is not set");
+    }
 
-    await mongoose.connect("mongodb+srv://test:test@test.kbupzaw.mongodb.net/test?retryWrites=true&w=majority&appName=test");
-    console.log(" MongoDB connected");
+    await mongoose.connect(mongoUri);
+    console.log("MongoDB connected");
   } catch (error) {
-    console.error(" MongoDB connection error:", error.message);
-    
+    console.error("MongoDB connection error:", error.message);
     process.exit(1);
   }
 };
