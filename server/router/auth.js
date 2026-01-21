@@ -82,6 +82,44 @@ router.post("/login", async (req, res) => {
   }
 });
 
+const handlePasswordUpdate = async (req, res) => {
+  try {
+    const currentPassword = req.body.currentPassword ?? req.body.oldPassword;
+    const { newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({ message: "currentPassword and newPassword are required" });
+    }
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
+      return res
+        .status(400)
+        .json({ message: `Password must be at least ${MIN_PASSWORD_LENGTH} characters` });
+    }
+
+    const user = await AuthUser.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    return res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to update password" });
+  }
+};
+
+router.post("/change-password", auth, handlePasswordUpdate);
+router.post("/update-password", auth, handlePasswordUpdate);
+
 router.get("/me", auth, async (req, res) => {
   try {
     const user = await AuthUser.findById(req.user.id).select("name email");
