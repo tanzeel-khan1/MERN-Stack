@@ -4,6 +4,7 @@ const connectDB = require("./config/db");
 const authRoutes = require("./router/auth");
 const userRoutes = require("./router/users");
 const productRoutes = require("./router/product-router");
+const scheduleExpiryNotifier = require("./jobs/expiry-notifier");
 
 require("dotenv").config();
 
@@ -18,6 +19,7 @@ app.use(
 );
 
 connectDB();
+scheduleExpiryNotifier();
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);

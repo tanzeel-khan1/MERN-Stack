@@ -11,6 +11,8 @@ const managedUserSchema = new mongoose.Schema(
     houseNumber: { type: String, required: true, trim: true },
     phoneNumber: { type: String, required: true, trim: true },
     expiryDate: { type: Date, required: true },
+    expiryNoticeSentFor: { type: Date, default: null },
+    expiryNoticeSentAt: { type: Date, default: null },
   },
   { timestamps: true }
 );
